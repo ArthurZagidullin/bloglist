@@ -9,5 +9,6 @@ use yii\helpers\Html;
 <ul>
     <li>Редактирование профиля</li>
     <li><?=Html::a('Список блогов', ['admin/blog'])?></li>
+    <li><?=Html::a('Список видео', ['admin/video'])?></li>
 </ul>
 

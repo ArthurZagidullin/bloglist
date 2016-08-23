@@ -102,6 +102,33 @@ class Blog extends \yii\db\ActiveRecord
         return $scenarios;
     }
 
+    public function createVideous()
+    {
+        $api = \Yii::$app->params['youtube_api_key'];
+        preg_match('/^(http(s?):\/\/)?(www\.)?\w+?\.(com|ru)(\/?\w+)+/i', $this->url, $match);
+        $chanel_id = preg_replace('/\//','',end($match));
+        if($chanel_id){
+            $url = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet&channelId={$chanel_id}&maxResults=50&key={$api}";
+            $obj = json_decode(file_get_contents($url));
+            if(isset($obj->error)){
+                return false;
+            }
+            foreach ($obj->items as $item){
+                $video = new Video();
+                $video->blog_id = $this->id;
+                $video->video_id = isset($item->id->videoId)?$item->id->videoId:'';
+                $video->title = isset($item->snippet->title)?$item->snippet->title:'';
+                $video->description = isset($item->snippet->description)?$item->snippet->description:'';
+                $video->published_at = $item->snippet->publishedAt;
+                if($video->validate()){
+                    $video->save();
+                } else {
+                    var_dump($video->getErrors());
+                }
+            }
+        }
+    }
+
     public function behaviors()
     {
         return [

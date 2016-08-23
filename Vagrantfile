@@ -1,4 +1,4 @@
-require 'yaml'
+require 'yaml'  
 require 'fileutils'
 
 domains = {
@@ -69,4 +69,8 @@ Vagrant.configure(2) do |config|
 
   # post-install message (vagrant console)
   config.vm.post_up_message = "Frontend URL: http://#{domains[:frontend]}\nBackend URL: http://#{domains[:backend]}"
+
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false
+  end
 end
