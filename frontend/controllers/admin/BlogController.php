@@ -70,14 +70,16 @@ class BlogController extends Controller
         $model->owner_id = Yii::$app->user->getId();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->save();
-            $model->createVideous();
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            $video = Yii::$app->ApiFactory->get($model->url)->getVideo();
+            if(count($video) > 0){
+                $model->save();
+                $model->setVideo($video);
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**

@@ -46,19 +46,12 @@ class m160820_150846_video_create extends Migration
     public function down()
     {
 
-        // drops foreign key for table `user`
+        // drops foreign key for table `blog`
         $this->dropForeignKey(
             'fk-video-blog_id',
             'video'
         );
 
-        // drops index for column `author_id`
-        $this->dropIndex(
-            'idx-video-video_id',
-            'video'
-        );
-
-        $this->dropTable('video');
 
         echo "m160820_150846_video_create reverted.\n";
 

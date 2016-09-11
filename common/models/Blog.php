@@ -22,6 +22,9 @@ class Blog extends \yii\db\ActiveRecord
 {
     const URL_VALIDATE = 'urlValidate';
 
+    public $category;
+
+    private $videos;
     /**
      * @inheritdoc
      */
@@ -38,11 +41,9 @@ class Blog extends \yii\db\ActiveRecord
         return [
             [['name', 'url', 'owner_id'], 'required'],
             [['owner_id',], 'integer'],
-//            [[ 'created_at', 'updated_at'],'timestamp'],
             [['name', 'url'], 'string', 'max' => 255],
             [['name','url'], 'unique'],
             ['url', 'match', 'pattern' => '/^(http(s?):\/\/)?(www\.)?\w+?\.(com|ru)(\/?\w+)+/i'],
-            ['url', 'chanelUrlValidate'],
             [['owner_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['owner_id' => 'id']],
         ];
     }
@@ -62,27 +63,13 @@ class Blog extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getChanelID()
+    public function setVideo($video)
     {
-        preg_match('/^(http(s?):\/\/)?(www\.)?\w+?\.(com|ru)(\/?\w+)+/i',$this->url, $match);
-        return preg_replace('/\//','',end($match));
-    }
-
-    public function chanelUrlValidate($attribute)
-    {
-        $api = \Yii::$app->params['youtube_api_key'];
-        preg_match('/^(http(s?):\/\/)?(www\.)?\w+?\.(com|ru)(\/?\w+)+/i', $this->$attribute, $match);
-        $chanel_id = preg_replace('/\//','',end($match));
-        if($chanel_id){
-            $url = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet&channelId={$chanel_id}&maxResults=0&key={$api}";
-            $obj = json_decode(file_get_contents($url));
-            if(isset($obj->error)){
-                $this->addError($attribute, 'Некоректный урл канала');
-            } elseif(isset($obj->pageInfo->totalResults) && $obj->pageInfo->totalResults == 0) {
-                $this->addError($attribute, 'Мы не публикуем пустые каналы. Добавьте видео');
+        foreach ($video as $v) {
+            if($v instanceof Video){
+                $v->blog_id = $this->id;
+                $v->save();
             }
-        } else {
-            $this->addError($attribute, 'Не удалось получить id-канала');
         }
     }
 
@@ -102,31 +89,16 @@ class Blog extends \yii\db\ActiveRecord
         return $scenarios;
     }
 
-    public function createVideous()
+
+    /**
+     * Добавляет видео которое будет привязано к текущему блогу, при сохранении
+     * @param Video $video
+     * @return $this
+     */
+    public function addVideo(Video $video)
     {
-        $api = \Yii::$app->params['youtube_api_key'];
-        preg_match('/^(http(s?):\/\/)?(www\.)?\w+?\.(com|ru)(\/?\w+)+/i', $this->url, $match);
-        $chanel_id = preg_replace('/\//','',end($match));
-        if($chanel_id){
-            $url = "https://www.googleapis.com/youtube/v3/search?order=date&part=snippet&channelId={$chanel_id}&maxResults=50&key={$api}";
-            $obj = json_decode(file_get_contents($url));
-            if(isset($obj->error)){
-                return false;
-            }
-            foreach ($obj->items as $item){
-                $video = new Video();
-                $video->blog_id = $this->id;
-                $video->video_id = isset($item->id->videoId)?$item->id->videoId:'';
-                $video->title = isset($item->snippet->title)?$item->snippet->title:'';
-                $video->description = isset($item->snippet->description)?$item->snippet->description:'';
-                $video->published_at = $item->snippet->publishedAt;
-                if($video->validate()){
-                    $video->save();
-                } else {
-                    var_dump($video->getErrors());
-                }
-            }
-        }
+        $this->videos[] = $video;
+        return $this;
     }
 
     public function behaviors()
