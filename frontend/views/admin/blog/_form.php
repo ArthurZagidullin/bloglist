@@ -7,7 +7,7 @@ use yii\widgets\ActiveForm;
 /* @var $model common\models\Blog */
 /* @var $form yii\widgets\ActiveForm */
 
-$category = \common\models\Category::find0()->all();
+$category = \common\models\Category::find()->all();
 $category_items = \yii\helpers\ArrayHelper::map($category,'id','name');
 
 $selected_categories = $model->getCategories()->all();
