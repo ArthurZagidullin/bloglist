@@ -4,11 +4,13 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\BlogSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Blogs';
-$this->params['breadcrumbs'][] = 'Admin';
+$this->title = 'Мои блоги';
+
+$this->params['breadcrumbs'][] = [ 'label' => 'Панель администратора', 'url' => '/admin'];
+$this->params['breadcrumbs'][] = 'Мои блоги';
+
 ?>
 <div class="blog-index">
 
@@ -20,17 +22,27 @@ $this->params['breadcrumbs'][] = 'Admin';
     </p>
 <?php Pjax::begin(); ?>    <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
             'name',
+            [
+                'label' => 'Категория',
+                'value' => function($data){
+                    $result = '<table>';
+                    $categories = $data->getCategories()->all();
+                    foreach ($categories as $category){
+                        $result .= "<tr><td>{$category->name}</td></tr>";
+                    }
+                    $result .= '</table>';
+                    return $result;
+                },
+                'format' => 'html',
+            ],
             'url:url',
-            'owner_id',
+            'owner.username',
             'created_at',
-            // 'updated_at',
-
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

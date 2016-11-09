@@ -9,6 +9,8 @@ use yii\widgets\ListView;
 
 $this->title = 'Videos';
 $this->params['breadcrumbs'][] = $this->title;
+
+if(isset($searchModel) && isset($dataProvider)):
 ?>
 <div class="video-index">
 
@@ -26,3 +28,9 @@ $this->params['breadcrumbs'][] = $this->title;
         },
     ]) ?>
 </div>
+<?php else: ?>
+    <div>
+        <p>У вас нет видео!</p>
+    </div>
+<?php endif; ?>
+

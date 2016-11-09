@@ -2,9 +2,12 @@
 
 namespace frontend\controllers\admin;
 
+use common\models\Blog;
 use Yii;
 use common\models\Video;
 use common\models\VideoSearch;
+use yii\data\ActiveDataProvider;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -12,7 +15,7 @@ use yii\filters\VerbFilter;
 /**
  * VideoController implements the CRUD actions for Video model.
  */
-class VideoController extends Controller
+class VideoController extends AdminController
 {
     /**
      * @inheritdoc
@@ -35,13 +38,24 @@ class VideoController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new VideoSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        if($blogs = Blog::find()->where([ 'owner_id' => Yii::$app->getUser()->id ])->all()){
+            $blogs_id = [];
+            foreach ($blogs as $blog){
+                $blogs_id[] = $blog->id;
+            }
+            $searchModel = new VideoSearch();
+            $dataProvider = new ActiveDataProvider([
+                'query' => Video::find()->where(['blog_id'=>$blogs_id]),
+                'pagination' => [
+                    'pageSize' => 20,
+                ],
+            ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+        return $this->render('index');
     }
 
     /**

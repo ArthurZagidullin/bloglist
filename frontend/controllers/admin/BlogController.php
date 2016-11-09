@@ -2,9 +2,14 @@
 
 namespace frontend\controllers\admin;
 
+use common\models\BlogCategoryRelation;
+use common\models\Category;
 use Yii;
 use common\models\Blog;
 use common\models\BlogSearch;
+use yii\base\Exception;
+use yii\data\ActiveDataProvider;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -15,7 +20,7 @@ use yii\widgets\ActiveForm;
  * BlogController implements the CRUD actions for Blog model.
  * TODO: Запрет на доступ не авторизованым пользователям
  */
-class BlogController extends Controller
+class BlogController extends AdminController
 {
     /**
      * @inheritdoc
@@ -38,11 +43,13 @@ class BlogController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new BlogSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        $dataProvider = new ActiveDataProvider([
+            'query' => Blog::find()->where(['owner_id'=>Yii::$app->getUser()->id]),
+            'pagination' => [
+                'pageSize' => 20,
+            ],
+        ]);
         return $this->render('index', [
-            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -93,7 +100,6 @@ class BlogController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post())) {
-            $model->updated_at = date('Y-m-d H:m:i');
             $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         }

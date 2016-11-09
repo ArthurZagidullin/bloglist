@@ -5,5 +5,8 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+        'ApiFactory' => [
+            'class' => 'common\components\ApiFactory'
+        ],
     ],
 ];

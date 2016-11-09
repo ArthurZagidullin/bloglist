@@ -28,11 +28,13 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'BlogLists',
+        'brandLabel' => 'BlogsList',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
+            'class' => 'navbar navbar-inverse navbar-fixed-center',
+
         ],
+        'innerContainerOptions' => ['class' => 'container-fluid']
     ]);
     $menuItems = [
         ['label' => 'Главная', 'url' => ['/site/index']],
@@ -54,7 +56,7 @@ AppAsset::register($this);
             . '</li>';
     }
     echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
+        'options' => ['class' => 'navbar-nav navbar-right '],
         'items' => $menuItems,
     ]);
     NavBar::end();
@@ -71,9 +73,8 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; Blogslist <?= date('Y') ?></p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
 

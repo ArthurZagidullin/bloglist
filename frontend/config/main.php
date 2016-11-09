@@ -40,7 +40,8 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'admin' => 'admin/admin'
+                'admin' => 'admin/admin',
+                'blog/<action:\w+>/<id:\d+>' => 'blog/<action>',
             ],
         ],
         

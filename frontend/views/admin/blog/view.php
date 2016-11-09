@@ -7,8 +7,10 @@ use yii\widgets\DetailView;
 /* @var $model common\models\Blog */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Blogs', 'url' => ['index']];
+$this->params['breadcrumbs'][] = [ 'label' => 'Панель администратора', 'url' => '/admin'];
+$this->params['breadcrumbs'][] = ['label' => 'Мои блоги', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="blog-view">
 
@@ -34,6 +36,19 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'owner_id',
             'created_at',
             'updated_at',
+            [
+                'label' => 'Категория',
+                'value' => call_user_func(function($data){
+                    $result = '<table>';
+                    $categories = $data->getCategories()->all();
+                    foreach ($categories as $category){
+                        $result .= "<tr><th>{$category->name}</th></tr>";
+                    }
+                    $result .= '</table>';
+                    return $result;
+                },$model),
+                'format' => 'html',
+            ],
         ],
     ]) ?>
 
