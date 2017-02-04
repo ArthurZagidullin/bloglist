@@ -77,7 +77,8 @@ class BlogController extends AdminController
         $model->owner_id = Yii::$app->user->getId();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $video = Yii::$app->ApiFactory->get($model->url)->getVideo();
+            $api = Yii::$app->ApiFactory->get($model->url);
+            $video = $api->getVideo();
             if(count($video) > 0){
                 $model->save();
                 $model->setVideo($video);

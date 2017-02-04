@@ -8,6 +8,7 @@
 
 namespace common\components\youtube;
 
+use common\models\VideoStatistic;
 use Yii;
 use common\models\Video;
 use yii\base\Exception;
@@ -19,10 +20,11 @@ class Api
     private $video = [];
     private $apiKey;
 
-    public function __construct($url)
+    public function setUrl($url)
     {
         $this->url = $url;
         $this->apiKey = \Yii::$app->params['youtube_api_key'];
+        return $this;
     }
 
     public function getVideo()
@@ -71,10 +73,35 @@ class Api
             $video->title = isset($item->snippet->title)?$item->snippet->title:'';
             $video->description = isset($item->snippet->description)?$item->snippet->description:'';
             $video->published_at = $item->snippet->publishedAt;
-
+            $this->videoStatistics($video);
             $this->video[] = $video;
         }
         return $this->video;
+    }
+
+    /**
+     * @param array $video
+     */
+    public function setVideo($video)
+    {
+        $this->video = $video;
+    }
+
+    public function videoStatistics(Video $video)
+    {
+//        https://www.googleapis.com/youtube/v3/videos?id='.$vid.'&part=statistics&key='.$API_key.''
+        $url = "https://www.googleapis.com/youtube/v3/videos?id={$video->video_id}&part=statistics&key={$this->apiKey}";
+        $result = json_decode(file_get_contents($url), true);
+        if(!isset($result['error'])){
+            $stat = new VideoStatistic();
+//            $stat->video_id = $video_id;
+            $stat->view = isset($result['items'][0]['statistics']['viewCount'])?$result['items'][0]['statistics']['viewCount']:0;
+            $stat->like = isset($result['items'][0]['statistics']['likeCount'])?$result['items'][0]['statistics']['likeCount']:0;
+            $stat->dislike = isset($result['items'][0]['statistics']['dislikeCount'])?$result['items'][0]['statistics']['dislikeCount']:0;
+            $stat->favorite = isset($result['items'][0]['statistics']['favoriteCount'])?$result['items'][0]['statistics']['favoriteCount']:0;
+            $stat->comment = isset($result['items'][0]['statistics']['commentCount'])?$result['items'][0]['statistics']['commentCount']:0;
+            $video->statistic = $stat;
+        }
     }
 
     public function addError($msg)

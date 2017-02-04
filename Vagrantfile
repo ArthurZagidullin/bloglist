@@ -73,4 +73,6 @@ Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |v|
     v.gui = false
   end
+
+    config.vm.network "forwarded_port", guest: 3306, host: 3306, protocol: "tcp"
 end

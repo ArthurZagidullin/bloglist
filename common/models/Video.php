@@ -23,6 +23,11 @@ use yii\db\ActiveRecord;
 class Video extends \yii\db\ActiveRecord
 {
     /**
+     * @var VideoStatistic
+     */
+    public $statistic;
+
+    /**
      * @inheritdoc
      */
     public static function tableName()
@@ -84,5 +89,13 @@ class Video extends \yii\db\ActiveRecord
                 'value' => function() { return date('Y-m-d H:m:i'); },
             ],
         ];
+    }
+
+    public function beforeSave($insert)
+    {
+        if($this->statistic instanceof VideoStatistic){
+            $this->statistic->save();
+        }
+        return parent::beforeSave($insert);
     }
 }

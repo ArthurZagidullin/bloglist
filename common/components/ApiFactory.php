@@ -20,9 +20,11 @@ class ApiFactory extends Component
     public function get($url)
     {
         if(preg_match('/youtube\.com/', $url)){
-            return new youtube\Api($url);
+            return (new youtube\Api())->setUrl($url);
         }
     }
+
+
 
 
 }

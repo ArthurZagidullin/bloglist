@@ -9,6 +9,10 @@ use yii\helpers\Html;
 $this->title = 'Добавить блог';
 $this->params['breadcrumbs'][] = ['label' => 'Blogs', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+if($model->errors){
+    print_r($model->errors);
+}
 ?>
 <div class="blog-create">
 
