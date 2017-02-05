@@ -73,7 +73,7 @@ class Api
             $video->title = isset($item->snippet->title)?$item->snippet->title:'';
             $video->description = isset($item->snippet->description)?$item->snippet->description:'';
             $video->published_at = $item->snippet->publishedAt;
-            $this->videoStatistics($video);
+//            $this->videoStatistics($video);
             $this->video[] = $video;
         }
         return $this->video;
